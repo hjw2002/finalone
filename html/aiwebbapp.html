@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hannah's Piano Practice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333;
+      flex-direction: column;
+    }
+
+    h1 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #game-container {
+      position: relative;
+      width: 300px;
+      height: 500px;
+      background-color: #444;
+      border: 2px solid #fff;
+      overflow: hidden;
+    }
+
+    .tile {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      opacity: 0.9;
+    }
+
+    #home-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px;
+      background-color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+
+    #restart-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      z-index: 1000;
+    }
+
+    #restart-popup button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hannah's Piano Practice</h1>
+  <button id="home-button" onclick="window.location.href = '../index.html#!';">Home</button>
+  <div id="restart-popup">
+    <p style="font-size: 20px;">Game Over!</p>
+    <button onclick="restartGame()">Restart</button>
+  </div>
+  <div id="game-container"></div>
+
+  <script>
+    const gameContainer = document.getElementById('game-container');
+    const restartPopup = document.getElementById('restart-popup');
+    const tileWidth = 100; // Tile width
+    const tileHeight = 100; // Tile height
+    const gameHeight = 500; // Container height
+    let gameInterval;
+    let tiles = [];
+    let gameOver = false;
+
+    // Function to create a tile
+    function createTile() {
+      if (gameOver) return;
+
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.style.top = '-' + tileHeight + 'px';
+      tile.style.left = Math.floor(Math.random() * 3) * tileWidth + 'px';
+      gameContainer.appendChild(tile);
+
+      let tilePosition = -tileHeight;
+
+      const tileInterval = setInterval(() => {
+        if (gameOver) {
+          clearInterval(tileInterval);
+          return;
+        }
+
+        tilePosition += 5;
+        tile.style.top = tilePosition + 'px';
+
+        if (tilePosition >= gameHeight) {
+          // Tile hit bottom, end the game
+          gameOver = true;
+          clearInterval(tileInterval);
+          endGame();
+        }
+      }, 20);
+
+      // Handle tile click
+      tile.addEventListener('click', () => {
+        if (gameOver) return;
+        tile.remove();
+        clearInterval(tileInterval);
+      });
+
+      tiles.push(tile);
+    }
+
+    // Start the game
+    function startGame() {
+      gameOver = false;
+      restartPopup.style.display = 'none';
+      tiles = [];
+      gameContainer.innerHTML = '';
+      gameInterval = setInterval(createTile, 1000);
+    }
+
+    // End the game
+    function endGame() {
+      clearInterval(gameInterval);
+      restartPopup.style.display = 'block'; // Show the restart pop-up
+    }
+
+    // Restart the game
+    function restartGame() {
+      restartPopup.style.display = 'none'; // Hide the pop-up
+      startGame(); // Restart the game
+    }
+
+    // Start the game on page load
+    window.onload = startGame;
+  </script>
+</body>
+</html>
